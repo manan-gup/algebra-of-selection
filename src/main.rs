@@ -85,13 +85,13 @@ fn main() {
     let Ds = Ds_1.expand();
     println!(
         "Raw Ds expression:\n{}",
-        &Ds.printer(PrintOptions::sympy().hide_namespace("satya_symbolica"))
+        &Ds.printer(PrintOptions::sympy().hide_namespace("algebra_of_selection"))
     );
 
     // Full foctorization of Ds
     let Ds_factored = &Ds.factor();
     println!(
         "Full foctorized Ds:\n{}",
-        &Ds_factored.printer(PrintOptions::sympy().hide_namespace("satya_symbolica"))
+        &Ds_factored.printer(PrintOptions::sympy().hide_namespace("algebra_of_selection"))
     );
 }
