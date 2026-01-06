@@ -28,6 +28,7 @@ dependencies = [
 name = "algebra-of-selection"
 version = "0.1.0"
 dependencies = [
+ "stupid_simple_dotenv",
  "symbolica",
 ]
 
@@ -482,6 +483,12 @@ name = "static_assertions"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
+
+[[package]]
+name = "stupid_simple_dotenv"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c51f5e4969a8fba74d587ecb675257343c69639f25c3eb0ed110f7e04e53be98"
 
 [[package]]
 name = "symbolica"

@@ -1,7 +1,9 @@
+use stupid_simple_dotenv::to_env;
 use symbolica::{atom::Atom, atom::AtomCore, parse, printer::PrintOptions, symbol, LicenseManager};
 
 fn main() {
-    LicenseManager::set_license_key("").unwrap();
+    to_env().ok();
+    // LicenseManager::set_license_key("").unwrap();
 
     // Symbols
     let (Q1, Q3, Z1, Z2, Z3) = symbol!("Q1", "Q3", "Z1", "Z2", "Z3");
