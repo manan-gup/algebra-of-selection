@@ -1,0 +1,7 @@
+[package]
+name = "algebra-of-selection"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+symbolica = "1.2.1"
