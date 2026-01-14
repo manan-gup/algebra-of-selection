@@ -33,18 +33,20 @@ fn main() {
     // );
 
     // Additive genetic values Ai
-    let A1 = &Beta_Za * &K_Za * 2;
-    let A2 = &Beta_Za * &K_Za;
-    // A3 = 0;
+    let A1 = &Beta_Za * 2 + &K_Za;
+    let A2 = &Beta_Za + &K_Za;
+    let A3 = &K_Za + 0;
 
     // Mean additive value E(A)
-    let EA = Atom::var(Q1) * &A1 + &Q2 * &A2;
+    let EA = Atom::var(Q1) * &A1 + &Q2 * &A2 + Atom::var(Q3) * &A3;
 
     // Selection
 
     // Mean fitness
     // Use EZ for EW
-    let EWA = Atom::var(Q1) * Atom::var(Z1) * &A1 + &Q2 * Atom::var(Z2) * &A2;
+    let EWA = Atom::var(Q1) * Atom::var(Z1) * &A1
+        + &Q2 * Atom::var(Z2) * &A2
+        + Atom::var(Q3) * Atom::var(Z3) * &A3;
 
     // Post selection frequency
     let Q11 = Atom::var(Q1) * (Atom::var(Z1) / &EZ);
@@ -72,11 +74,11 @@ fn main() {
 
     // Post mating / next generation frequencies
     let Q111 = &f11 + &f12 / 2 + &f21 / 2 + &f22 / 4;
-    let Q211 = (&f12 + &f13 + &f21 + &f22 + &f23 + &f32) / 2 + &f31;
+    let Q211 = (&f12 + &f21 + &f22 + &f23 + &f32) / 2 + &f13 + &f31;
     let Q311 = &f22 / 4 + (&f23 + &f32) / 2 + &f33;
 
     // Generation 2 phenotypic mean
-    let Ez = Atom::var(Z1) * &Q111 + Atom::var(Z2) * &Q211 + Atom::var(Z1) * &Q311;
+    let Ez = Atom::var(Z1) * &Q111 + Atom::var(Z2) * &Q211 + Atom::var(Z3) * &Q311;
 
     // Total selection response
     let SR_T = &Ez - &EZ;
@@ -90,10 +92,10 @@ fn main() {
         &Ds.printer(PrintOptions::sympy().hide_namespace("algebra_of_selection"))
     );
 
-    // Full foctorization of Ds
+    // Full factorization of Ds
     let Ds_factored = &Ds.factor();
     println!(
-        "Full foctorized Ds:\n{}",
+        "Full factorized Ds:\n{}",
         &Ds_factored.printer(PrintOptions::sympy().hide_namespace("algebra_of_selection"))
     );
 }
