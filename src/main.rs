@@ -1,20 +1,34 @@
 #![allow(non_snake_case)]
 use ahash::HashMap;
-
 use stupid_simple_dotenv::to_env;
-use symbolica::{atom::Atom, atom::AtomCore, parse, printer::PrintOptions, symbol, LicenseManager};
+use symbolica::{
+    atom::{Atom, AtomCore},
+    printer::PrintOptions,
+    symbol,
+};
 
-macro_rules! eval_f64 {
-    ($atom:ident, $const_map:ident) => {
-        $atom
-            .evaluate(|r| r.to_f64(), &$const_map, &HashMap::default())
-            .unwrap()
+/// Prints the result of evaluating one or more symbolica Atoms as f64 given a const_map
+/// # Usage
+/// ```
+/// println_eval!(const_map, atom);
+/// // Prints:
+/// // [eval f64] atom = <f64 answer>
+/// println_eval!(const_map, atom1, atom2);
+/// // Prints:
+/// // [eval f64] atom1 = <f64 answer>
+/// // [eval f64] atom2 = <f64 answer>
+/// ```
+macro_rules! println_eval {
+    ($const_map:ident, $($atom:ident),+) => {
+        $(
+            println!("[eval f64] {} = {}", stringify!($atom), $atom.evaluate(|r| r.to_f64(), &$const_map, &HashMap::default()).unwrap());
+        )+
     };
 }
 
 fn main() {
-    to_env().ok();
     // LicenseManager::set_license_key("").unwrap();
+    to_env().ok();
 
     // Symbols
     let (Q1, Q3, Z1, Z2, Z3) = symbol!("Q1", "Q3", "Z1", "Z2", "Z3");
@@ -33,28 +47,19 @@ fn main() {
 
     // Mean phenotype
     let EZ = Atom::var(Q1) * Atom::var(Z1) + &Q2 * Atom::var(Z2) + Atom::var(Q3) * Atom::var(Z3);
-    println!("EZ = {}", eval_f64!(EZ, values));
+    println_eval!(values, EZ);
 
     // Mean allele dosage (a1 = 2, a2 = 1, a3 = 0)
     let Ea = Atom::var(Q1) * 2 + &Q2;
     let Eaa = Atom::var(Q1) * 4 + &Q2;
     let EaZ = Atom::var(Q1) * Atom::var(Z1) * 2 + Atom::var(Z2) * &Q2;
     // println!("EaZ = {}", &EaZ.printer(PrintOptions::latex()));
-    println!(
-        "Ea = {}\nEaa = {}\nEaZ = {}",
-        eval_f64!(Ea, values),
-        eval_f64!(Eaa, values),
-        eval_f64!(EaZ, values)
-    );
+    println_eval!(values, Ea, Eaa, EaZ);
 
     // Z vs a regression
     let Beta_Za = ((&EaZ - &Ea * &EZ) / (&Eaa - &Ea * &Ea)).expand();
     let K_Za = (&EZ - &Beta_Za * &Ea).expand();
-    println!(
-        "Beta_Za = {}\nK_Za = {}",
-        eval_f64!(Beta_Za, values),
-        eval_f64!(K_Za, values)
-    );
+    println_eval!(values, Beta_Za, K_Za);
     // println!(
     //     "Beta_Za = {}\nK_Za = {}",
     //     &Beta_Za.printer(PrintOptions::sympy()),
@@ -76,7 +81,7 @@ fn main() {
     let EWA = Atom::var(Q1) * Atom::var(Z1) * &A1
         + &Q2 * Atom::var(Z2) * &A2
         + Atom::var(Q3) * Atom::var(Z3) * &A3;
-    println!("EWA = {}", eval_f64!(EWA, values));
+    println_eval!(values, EWA);
 
     // Post selection frequency
     let Q11 = Atom::var(Q1) * (Atom::var(Z1) / &EZ);
@@ -85,7 +90,7 @@ fn main() {
 
     // Fisherian selection response (Cov(g,w)/EW)
     let SR_F = (&EWA - &EZ * &EA) / &EZ;
-    println!("SR_F = {}", eval_f64!(SR_F, values));
+    println_eval!(values, SR_F);
     // println!("SR_F = {}", &SR_F.together().printer(PrintOptions::latex()));
 
     // Mating
@@ -107,25 +112,20 @@ fn main() {
     let Q111 = &f11 + &f12 / 2 + &f21 / 2 + &f22 / 4;
     let Q211 = (&f12 + &f21 + &f22 + &f23 + &f32) / 2 + &f13 + &f31;
     let Q311 = &f22 / 4 + (&f23 + &f32) / 2 + &f33;
-    println!(
-        "Q111 = {}\nQ211 = {}\nQ311 = {}",
-        eval_f64!(Q111, values),
-        eval_f64!(Q211, values),
-        eval_f64!(Q311, values)
-    );
+    println_eval!(values, Q111, Q211, Q311);
 
     // Generation 2 phenotypic mean
     let Ez = Atom::var(Z1) * &Q111 + Atom::var(Z2) * &Q211 + Atom::var(Z3) * &Q311;
 
     // Total selection response
     let SR_T = &Ez - &EZ;
-    println!("SR_T = {}", eval_f64!(SR_T, values));
+    println_eval!(values, SR_T);
 
     // Discrepancy: TSR - FSR
     let Ds_1 = &SR_T - &SR_F;
     // Full Ds expression
     let Ds = Ds_1.expand();
-    println!("Ds = {}", eval_f64!(Ds, values));
+    println_eval!(values, Ds);
     println!(
         "Raw Ds expression:\n{}",
         &Ds.printer(PrintOptions::sympy().hide_namespace("algebra_of_selection"))
@@ -133,7 +133,7 @@ fn main() {
 
     // Full factorization of Ds
     let Ds_factored = &Ds.factor();
-    println!("Ds_factored = {}", eval_f64!(Ds_factored, values));
+    println_eval!(values, Ds_factored);
     println!(
         "Full factorized Ds:\n{}",
         &Ds_factored.printer(PrintOptions::sympy().hide_namespace("algebra_of_selection"))
