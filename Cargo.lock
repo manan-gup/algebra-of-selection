@@ -28,6 +28,7 @@ dependencies = [
 name = "algebra-of-selection"
 version = "0.1.0"
 dependencies = [
+ "ahash",
  "stupid_simple_dotenv",
  "symbolica",
 ]
